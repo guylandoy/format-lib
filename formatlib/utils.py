@@ -13,7 +13,7 @@ def get_lat_lon_object_from_tuple(lat_lon_tuple):
 
 # convert Date to timestamp of UTC timezone according to format given (format of datetime.strptime)
 def date_to_timestamp(date, input_format):
-    return datetime.strptime(date, input_format).replace(tzinfo=timezone.utc).timestamp()
+    return int(datetime.strptime(date, input_format).replace(tzinfo=timezone.utc).timestamp())
 
 
 # Convert utm easting and northing coordinates to Latitude and Longitude using utm package.
