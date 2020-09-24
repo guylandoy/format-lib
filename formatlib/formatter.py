@@ -7,8 +7,9 @@ class Formatter:
         self.data = json.loads(data)
 
     def convert_dates(self, column_names, input_formats):
-        if len(column_names) != len(input_formats):
-            raise Exception("column names and formats doesn't match")
+        if type(column_names) != list or type(input_formats) != list \
+                or len(column_names) != len(input_formats) or len(column_names) <= 0:
+            raise Exception("column names and formats are not correct")
         # Update every column in json to the result of the date_formatter.
         for x in range(len(column_names)):
             self.data = self.convert_date(column_names[x], input_formats[x])
