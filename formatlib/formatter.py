@@ -59,7 +59,20 @@ class Formatter:
     def get_key_data(self, key_string):
         return self.data[key_string]
 
+    def flatten_json(self):
+        sep = '_'
+        out = dict()
+        def flatten(the_obj: (list, dict, str), name: str=''):
+            if type(the_obj) is dict:
+                for nested in the_obj:
+                    flatten(the_obj[nested], f'{name}{nested}{sep}')
+            elif type(the_obj) is list:
+                counter = 0
+                for nested in the_obj:
+                    flatten(nested, f'{name}{counter}{sep}')
+                    counter += 1
+            else:
+                out[name[:-1]] = the_obj
 
-
-
-
+        flatten(self)
+        return out
