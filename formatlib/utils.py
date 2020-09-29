@@ -46,21 +46,19 @@ def round_half_up(n, decimals=0):
 # Gets UTM location data and returns [easting, northing]
 def utm_parser(data):
     result = [None, None]
-
-    if type(data) == dict:
+    if isinstance(data, dict):
         for key, value in data.items():
-            if type(value) == int or type(value) == float:
-
+            if isinstance(value, int) or isinstance(value, float):
                 result = update_utm(result, value)
-            elif type(value) == str:
+            elif isinstance(value, str):
                 value = float(value)
                 result = update_utm(result, value)
 
-    elif type(data) == list:
+    elif isinstance(data, list):
         for value in data:
-            if type(value) == int or type(value) == float:
+            if isinstance(value, int) or isinstance(value, float):
                 result = update_utm(result, value)
-            elif type(value) == str:
+            elif isinstance(value, str):
                 value = float(value)
                 result = update_utm(result, value)
     return result
@@ -74,4 +72,7 @@ def update_utm(arr, value):
     elif len(str(int(value))) == 6:
         arr[0] = float(value)
     return arr
+
+
+
 
