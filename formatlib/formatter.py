@@ -28,8 +28,19 @@ class Formatter:
 
     def convert_utm(self, key_name):
         key_data = self.get_key_data(key_name)
-        utm_data = utm_parser(key_data)
+        utm_data = parser(key_data, update_utm)
+        if check_none(utm_data):
+            return self.data
         formatted_result = utm_to_wgs84(utm_data[0], utm_data[1])
+        self.save_formatted(key_name, formatted_result)
+        return self.data
+
+    def convert_wgs(self, key_name):
+        key_data = self.get_key_data(key_name)
+        wgs_data = parser(key_data, update_wgs)
+        if check_none(wgs_data):
+            return self.data
+        formatted_result = get_lat_lon_object_from_tuple(wgs_data)
         self.save_formatted(key_name, formatted_result)
         return self.data
 

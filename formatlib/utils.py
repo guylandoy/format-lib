@@ -43,36 +43,58 @@ def round_half_up(n, decimals=0):
     return math.floor(n*multiplier + 0.5) / multiplier
 
 
-# Gets UTM location data and returns [easting, northing]
-def utm_parser(data):
-    result = [None, None]
-    if isinstance(data, dict):
-        for key, value in data.items():
-            if isinstance(value, int) or isinstance(value, float):
-                result = update_utm(result, value)
-            elif isinstance(value, str):
-                value = float(value)
-                result = update_utm(result, value)
-
-    elif isinstance(data, list):
-        for value in data:
-            if isinstance(value, int) or isinstance(value, float):
-                result = update_utm(result, value)
-            elif isinstance(value, str):
-                value = float(value)
-                result = update_utm(result, value)
-    return result
-
-
-# check number of digits before decimal point. if its 6 digits long it is probably northing.
-# if it is 6 digits long, it is probably easting.
 def update_utm(arr, value):
+    try:
+        first_six = len(str(int(arr[0]))) == 6
+    except:
+        first_six = False
+
     if len(str(int(value))) == 7:
         arr[1] = float(value)
-    elif len(str(int(value))) == 6:
+    elif len(str(int(value))) == 6 and not first_six:
         arr[0] = float(value)
+    elif len(str(int(value))) == 6 and first_six:
+        if arr[0] > value:
+            arr[1] = 3000000 + value
+            return arr
+        return [arr[1], 3000000 + arr[0]]
     return arr
 
 
+def update_wgs(arr, value):
+    if 34 <= int(value) <= 35:
+        arr[1] = value
+    elif 29 <= int(value) < 34:
+        arr[0] = value
+    return arr
 
+
+def parser(data, update_func):
+    try:
+        result = [None, None]
+        if isinstance(data, dict):
+            data = list(data.values())
+
+        if isinstance(data, list):
+            for value in data:
+                if isinstance(value, str):
+                    value = float(value)
+                if isinstance(value, int) or isinstance(value, float):
+                    result = update_func(result, value)
+
+        return result
+    except Exception as e:
+        print("Error parsing", e)
+        return result
+
+
+def check_none(data):
+    if data is None:
+        return True
+    elif isinstance(data, list) and len(data) != 2:
+        return True
+    elif data[0] is None or data[1] is None:
+        return True
+    else:
+        return False
 
