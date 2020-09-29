@@ -1,3 +1,9 @@
 /venv/
 /tests/
 /requirements.txt
+/format_lib.egg-info/
+/formatlib.egg-info/
+/.idea/
+/build/
+/dist/
+/formatlib/__pycache__

@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import utm
 from pyproj import Proj, transform, CRS
+import math
 
 wgs84 = CRS("EPSG:4326")  # LatLon with WGS84 datum used by GPS unit
 UTM36N = CRS("EPSG:32636")
@@ -8,7 +9,7 @@ UTM36N = CRS("EPSG:32636")
 
 # Convert tuple of (latitude, longitude) to object
 def get_lat_lon_object_from_tuple(lat_lon_tuple):
-    return {'latitude': lat_lon_tuple[0], 'longitude': lat_lon_tuple[1]}
+    return {'latitude': round_half_up(lat_lon_tuple[0], 6), 'longitude': round_half_up(lat_lon_tuple[1], 6)}
 
 
 # convert Date to timestamp of UTC timezone according to format given (format of datetime.strptime)
@@ -34,4 +35,42 @@ def coordinates_proj(proj, ellps, coordinate1, coordinate2):
 # Convert utm easting and northing using pyproj.transform from UTM Zone 36N, to WGS84 latitude and longitude.
 def utm_to_wgs84(easting, northing):
     return get_lat_lon_object_from_tuple(transform(UTM36N, wgs84, easting, northing))
+
+
+def round_half_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return math.floor(n*multiplier + 0.5) / multiplier
+
+
+# Gets UTM location data and returns [easting, northing]
+def utm_parser(data):
+    result = [None, None]
+
+    if type(data) == dict:
+        for key, value in data.items():
+            if type(value) == int or type(value) == float:
+
+                result = update_utm(result, value)
+            elif type(value) == str:
+                value = float(value)
+                result = update_utm(result, value)
+
+    elif type(data) == list:
+        for value in data:
+            if type(value) == int or type(value) == float:
+                result = update_utm(result, value)
+            elif type(value) == str:
+                value = float(value)
+                result = update_utm(result, value)
+    return result
+
+
+# check number of digits before decimal point. if its 6 digits long it is probably northing.
+# if it is 6 digits long, it is probably easting.
+def update_utm(arr, value):
+    if len(str(int(value))) == 7:
+        arr[1] = float(value)
+    elif len(str(int(value))) == 6:
+        arr[0] = float(value)
+    return arr
 
