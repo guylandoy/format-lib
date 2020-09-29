@@ -62,11 +62,12 @@ class Formatter:
     def flatten_json(self):
         sep = '_'
         out = dict()
+
         def flatten(the_obj: (list, dict, str), name: str=''):
-            if type(the_obj) is dict:
+            if isinstance(the_obj, dict):
                 for nested in the_obj:
                     flatten(the_obj[nested], f'{name}{nested}{sep}')
-            elif type(the_obj) is list:
+            elif isinstance(the_obj, list):
                 counter = 0
                 for nested in the_obj:
                     flatten(nested, f'{name}{counter}{sep}')

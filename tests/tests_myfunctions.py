@@ -92,3 +92,12 @@ def test8():
     assert res[format_key("geometry.coordinates")]["latitude"] == 31.781882 \
            and res[format_key("geometry.coordinates")]["longitude"] == 34.804687
 
+
+def test9():
+    from benedict import benedict
+    from formatlib import formatter
+    with open('data_samples/test9.json', 'r') as json_file:
+        formatter = formatter.Formatter(json_file)
+    res = benedict(formatter.flatten_json())
+    assert res["a_b_c"] == 1
+

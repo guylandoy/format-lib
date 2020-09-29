@@ -81,11 +81,10 @@ def parser(data, update_func):
                     value = float(value)
                 if isinstance(value, int) or isinstance(value, float):
                     result = update_func(result, value)
-
         return result
     except Exception as e:
         print("Error parsing", e)
-        return result
+        return [None, None]
 
 
 def check_none(data):
