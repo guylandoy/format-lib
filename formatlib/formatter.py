@@ -74,5 +74,5 @@ class Formatter:
             else:
                 out[name[:-1]] = the_obj
 
-        flatten(self)
+        flatten(self.data)
         return out
