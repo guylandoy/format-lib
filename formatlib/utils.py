@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 import utm
-from pyproj import Proj, transform, CRS
+from pyproj import Proj, CRS, Transformer
 import math
 
 wgs84 = CRS("EPSG:4326")  # LatLon with WGS84 datum used by GPS unit
 UTM36N = CRS("EPSG:32636")
+utm_transformer = Transformer.from_crs(UTM36N, wgs84)
 
 
 # Convert tuple of (latitude, longitude) to object
@@ -32,9 +33,9 @@ def coordinates_proj(proj, ellps, coordinate1, coordinate2):
         return get_lat_lon_object_from_tuple((lat, lng))
 
 
-# Convert utm easting and northing using pyproj.transform from UTM Zone 36N, to WGS84 latitude and longitude.
+# Convert utm easting and northing using pyproj.Transformer from UTM Zone 36N, to WGS84 latitude and longitude.
 def utm_to_wgs84(easting, northing):
-    return get_lat_lon_object_from_tuple(transform(UTM36N, wgs84, easting, northing))
+    return get_lat_lon_object_from_tuple(utm_transformer.transform(easting, northing))
 
 
 def round_half_up(n, decimals=0):
