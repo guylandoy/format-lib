@@ -66,3 +66,29 @@ def test6():
            and res[format_key("a.b.c.loc")]["latitude"] == 32.015281 \
            and res[format_key("a.b.c.loc")]["longitude"] == 34.748833
 
+
+def test7():
+    from benedict import benedict
+    from formatlib import formatter
+    with open('data_samples/test7.json', 'r') as json_file:
+        formatter = formatter.Formatter(json_file)
+
+    formatter.convert_utm("geometry.coordinates")
+    res = benedict(formatter.convert_utm("a.b.c.loc"))
+    assert res[format_key("geometry.coordinates")]["latitude"] == 32.096175 \
+           and res[format_key("geometry.coordinates")]["longitude"] == 34.805204 \
+           and res[format_key("a.b.c.loc")]["latitude"] == 32.015281 \
+           and res[format_key("a.b.c.loc")]["longitude"] == 34.748833
+
+
+def test8():
+    from benedict import benedict
+    from formatlib import formatter
+    with open('data_samples/test8.json', 'r') as json_file:
+        formatter = formatter.Formatter(json_file)
+
+    res = benedict(formatter.convert_wgs("geometry.coordinates"))
+    print("TEST8:", res)
+    assert res[format_key("geometry.coordinates")]["latitude"] == 31.781882 \
+           and res[format_key("geometry.coordinates")]["longitude"] == 34.804687
+
