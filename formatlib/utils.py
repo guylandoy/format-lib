@@ -1,11 +1,10 @@
 from datetime import datetime, timezone
-import utm
-from pyproj import Proj, CRS, Transformer
+from pyproj import CRS, Transformer
 import math
 
-wgs84 = CRS("EPSG:4326")  # LatLon with WGS84 datum used by GPS unit
+WGS84 = CRS("EPSG:4326")  # LatLon with WGS84 datum used by GPS unit
 UTM36N = CRS("EPSG:32636")
-utm_transformer = Transformer.from_crs(UTM36N, wgs84)
+utm_transformer = Transformer.from_crs(UTM36N, WGS84)
 
 
 # Convert tuple of (latitude, longitude) to object
@@ -16,21 +15,6 @@ def get_lat_lon_object_from_tuple(lat_lon_tuple):
 # Convert Date to timestamp of UTC timezone according to format given (format of datetime.strptime)
 def date_to_timestamp(date, input_format):
     return int(datetime.strptime(date, input_format).replace(tzinfo=timezone.utc).timestamp())
-
-
-# Convert utm easting and northing coordinates to Latitude and Longitude using utm package.
-# def utm_to_lat_long(easting, northing):
-#     lat_lon = utm.to_latlon(easting, northing, 36, 'N')
-#     return get_lat_lon_object_from_tuple(lat_lon)
-
-
-# Use pyproj.Proj to get latitude and longitude
-# based on given projection (proj) and ellipsoid (ellps) with 2 coordinates
-# def coordinates_proj(proj, ellps, coordinate1, coordinate2):
-#     if proj == 'utm':
-#         p = Proj(proj='utm', zone=36, ellps=ellps, preserve_units=False)
-#         (lng, lat) = p(coordinate1, coordinate2, inverse=True)
-#         return get_lat_lon_object_from_tuple((lat, lng))
 
 
 # Convert utm easting and northing using pyproj.Transformer from UTM Zone 36N, to WGS84 latitude and longitude.
@@ -51,16 +35,19 @@ def update_coordinate_utm(arr, value):
     except Exception:
         first_six = False
 
-    if len(str(int(value))) == 7:
-        arr[1] = float(value)
-    elif len(str(int(value))) == 6 and not first_six:
-        arr[0] = float(value)
-    elif len(str(int(value))) == 6 and first_six:
-        if arr[0] > value:
-            arr[1] = 3000000 + value
-            return arr
-        return [arr[1], 3000000 + arr[0]]
-    return arr
+    try:
+        if len(str(int(value))) == 7:
+            arr[1] = float(value)
+        elif len(str(int(value))) == 6 and not first_six:
+            arr[0] = float(value)
+        elif len(str(int(value))) == 6 and first_six:
+            if arr[0] > value:
+                arr[1] = 3000000 + value
+                return arr
+            return [arr[1], 3000000 + arr[0]]
+        return arr
+    except Exception:
+        return arr
 
 
 # WGS Coordinate checker. Figure out if value is latitude or longitude.
@@ -88,7 +75,7 @@ def find_coordinates(data, update_coordinate):
                     result = update_coordinate(result, value)
         return result
     except Exception as e:
-        print("Error parsing", e)
+        print("Error finding coordinates", e)
         return [None, None]
 
 
@@ -103,3 +90,16 @@ def check_none(data):
     else:
         return False
 
+# Convert utm easting and northing coordinates to Latitude and Longitude using utm package.
+# def utm_to_lat_long(easting, northing):
+#     lat_lon = utm.to_latlon(easting, northing, 36, 'N')
+#     return get_lat_lon_object_from_tuple(lat_lon)
+
+
+# Use pyproj.Proj to get latitude and longitude
+# based on given projection (proj) and ellipsoid (ellps) with 2 coordinates
+# def coordinates_proj(proj, ellps, coordinate1, coordinate2):
+#     if proj == 'utm':
+#         p = Proj(proj='utm', zone=36, ellps=ellps, preserve_units=False)
+#         (lng, lat) = p(coordinate1, coordinate2, inverse=True)
+#         return get_lat_lon_object_from_tuple((lat, lng))
