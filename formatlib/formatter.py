@@ -67,7 +67,17 @@ class Formatter:
     def get_key_data(self, key_string):
         return self.data[key_string]
 
-    # Flatten data.
+    # Flatten data - Arrays not being flattened.
+    def flatten(self):
+        self.data = self.data.flatten()
+        return self.data
+
+    # Change key names to be lower case and underscore between words.
+    def standardize(self):
+        self.data.standardize()
+        return self.data
+
+    # Flatten data including arrays
     def flatten_json(self):
         sep = '_'
         out = dict()
