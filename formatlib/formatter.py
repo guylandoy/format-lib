@@ -20,38 +20,46 @@ class Formatter:
             self.data = self.convert_date(key_names[x], input_formats[x])
         return self.data
 
-    # Convert a key to timestamp UTC tz.
+    # Convert Date data in key_name with format of 'input_format' to timestamp UTC timezone.
     def convert_date(self, key_name, input_format):
         formatted_result = date_to_timestamp(self.get_key_data(key_name), input_format)
-        self.save_formatted(key_name, formatted_result)
+        self.save_formatted_result(key_name, formatted_result)
         return self.data
 
+    # Convert UTM data in key_name to WGS84 Latitude/Longitude.
     def convert_utm(self, key_name):
         key_data = self.get_key_data(key_name)
-        utm_data = parser(key_data, update_utm)
+        utm_data = find_coordinates(key_data, update_coordinate_utm)
         if check_none(utm_data):
             return self.data
         formatted_result = utm_to_wgs84(utm_data[0], utm_data[1])
-        self.save_formatted(key_name, formatted_result)
+        self.save_formatted_result(key_name, formatted_result)
         return self.data
 
+    # Convert WGS data in key_name to WGS84 Latitude/Longitude.
     def convert_wgs(self, key_name):
         key_data = self.get_key_data(key_name)
-        wgs_data = parser(key_data, update_wgs)
+        wgs_data = find_coordinates(key_data, update_coordinate_wgs)
         if check_none(wgs_data):
             return self.data
         formatted_result = get_lat_lon_object_from_tuple(wgs_data)
-        self.save_formatted(key_name, formatted_result)
+        self.save_formatted_result(key_name, formatted_result)
         return self.data
 
+    # Return the data.
     def get_data(self):
         return self.data
 
+    # Set new data
     def set_data(self, new_data):
-        self.data = new_data
+        if type(new_data) == str:
+            self.data = benedict(json.loads(new_data))
+        else:
+            self.data = benedict(json.load(new_data))
         return self.data
 
-    def save_formatted(self, key_name, formatted_result):
+    # Save formatted result in a new key.
+    def save_formatted_result(self, key_name, formatted_result):
         new_key_name = key_name + '_formatted'
         self.data[new_key_name] = formatted_result
 
@@ -59,6 +67,7 @@ class Formatter:
     def get_key_data(self, key_string):
         return self.data[key_string]
 
+    # Flatten data.
     def flatten_json(self):
         sep = '_'
         out = dict()
