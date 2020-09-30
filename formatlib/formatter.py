@@ -1,6 +1,7 @@
 import json
 from .utils import *
 from benedict import benedict
+from formatlib.utilities.standardize import standardize
 
 
 class Formatter:
@@ -74,7 +75,7 @@ class Formatter:
 
     # Change key names to be lower case and underscore between words.
     def standardize(self):
-        self.data.standardize()
+        standardize(self.data)
         return self.data
 
     # Flatten data including arrays
@@ -95,4 +96,5 @@ class Formatter:
                 out[name[:-1]] = the_obj
 
         flatten(self.data)
-        return out
+        self.data = out
+        return self.data

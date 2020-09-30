@@ -125,3 +125,15 @@ def test11():
     res = formatter.flatten_json()
     assert res['position_ahead_no_standard_names_and_looks'] == 1
 
+
+# Flatten and standardize with hebrew
+def test12():
+    from formatlib import formatter
+    from benedict import benedict
+    with open('data_samples/test12.json', 'r', encoding="utf-8") as json_file:
+        formatter = formatter.Formatter(json_file)
+    formatter.flatten_json()
+    formatter.standardize()
+    res = formatter.get_data()
+    assert res['אוקיי_מה_הולך'] == 3 and res['position_ahead_no_standard_names_and_looks'] == 1
+
