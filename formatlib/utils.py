@@ -1,7 +1,9 @@
 from datetime import datetime, timezone
 from pyproj import CRS, Transformer
 import math
+import logging
 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 WGS84 = CRS("EPSG:4326")  # LatLon with WGS84 datum used by GPS unit
 UTM36N = CRS("EPSG:32636")
 utm_transformer = Transformer.from_crs(UTM36N, WGS84)
@@ -32,7 +34,7 @@ def round_half_up(n, decimals=0):
 def update_coordinate_utm(arr, value):
     try:
         first_six = len(str(int(arr[0]))) == 6
-    except Exception:
+    except TypeError:
         first_six = False
 
     try:
@@ -45,9 +47,11 @@ def update_coordinate_utm(arr, value):
                 arr[1] = 3000000 + value
                 return arr
             return [arr[1], 3000000 + arr[0]]
+        else:
+            raise Exception("The value %s is not a 6 or 7 digits number so it cannot be converted to WGS" % value)
         return arr
-    except Exception:
-        return arr
+    except Exception as e:
+        return e
 
 
 # WGS Coordinate checker. Figure out if value is latitude or longitude.
@@ -57,6 +61,8 @@ def update_coordinate_wgs(arr, value):
         arr[1] = value
     elif 29 <= int(value) < 34:
         arr[0] = value
+    else:
+        raise ValueError("Value: %s is not in the range of 29 to 36 to be apart of a valid coordinate" % value)
     return arr
 
 
@@ -73,6 +79,7 @@ def find_coordinates(data, update_coordinate):
                     value = float(value)
                 if isinstance(value, int) or isinstance(value, float):
                     result = update_coordinate(result, value)
+        logging.info("Successfully found coordinates")
         return result
     except Exception as e:
         print("Error finding coordinates", e)
@@ -89,6 +96,8 @@ def check_none(data):
         return True
     else:
         return False
+
+
 
 # Convert utm easting and northing coordinates to Latitude and Longitude using utm package.
 # def utm_to_lat_long(easting, northing):

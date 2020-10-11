@@ -137,3 +137,5 @@ def test12():
     res = formatter.get_data()
     assert res['אוקיי_מה_הולך'] == 3 and res['position_ahead_no_standard_names_and_looks'] == 1
 
+
+test1()
